@@ -1,0 +1,13 @@
+.vscode
+proj.android
+proj.ios
+proj.mac
+proj.win32
+
+studio
+
+debug.log
+run-mac.sh
+scripts.config
+scripts.luaproj
+scripts.v11.suo

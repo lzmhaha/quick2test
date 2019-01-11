@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.5" orientation="isometric" renderorder="right-down" width="50" height="50" tilewidth="160" tileheight="100" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" name="tiled" tilewidth="160" tileheight="100" spacing="2" margin="1" tilecount="25" columns="5">
+  <image source="tiled.png" width="810" height="510"/>
+ </tileset>
+ <layer name="floor" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt0bEJACAQBMFH++9ZizAYYYNj04NZM7Pv1ucVPryo8CGPPNQKH/LIQ63wIY881Aof8shDrfAhjzzUCh/yyEOt8CGPPNQKH/LIQ63wIY881Aof8shDrfAhjzzUCh/yyEPtAUonGGs=
+  </data>
+ </layer>
+</map>
