@@ -7,7 +7,8 @@ function MainScene:ctor()
     -- bg:addTo(self)
     math.randomseed(os.time())
 
-    local lb = ui.newTTFLabel({text = 'hello', size = 70})
+    local lb = ui.newBMFontLabel({text = '123', font = 'fonts/font.fnt'})
+    -- local lb = ui.newTTFLabel({text = 'hello', size = 70})
     lb:pos(display.cx, display.cy):addTo(self, 1)
     self.lb = lb
 
