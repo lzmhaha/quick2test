@@ -131,10 +131,11 @@ function MainScene:addListView()
 end
 
 function MainScene:addScrollView()
-    local rect = cc.rect(0, 0, 200, 200)
+    local rect = cc.rect(200, 400, 200, 200)
     local sv = cc.ui.UIScrollView.new{viewRect = rect, direction = cc.ui.UIScrollView.DIRECTION_VERTICAL}
     sv:addBgColorIf({bgColor = ccc4(125, 125, 125, 255), viewRect = rect})
-    sv:addTo(self):pos(20, 200)
+    sv:addTo(self)
+        -- :pos(20, 200)
 
     local panel = cc.ui.UIPanel.new({})
     -- panel:size(100, 300)
@@ -145,17 +146,17 @@ function MainScene:addScrollView()
         -- local btn = cc.ui.UIPushButton.new('imgs/btn1.png', {listener = function()
         --     print('on btn click')
         -- end})addTo(panel):pos(0, 45 * i)
-        display.newSprite('imgs/btn1.png', 100, 45 * i):addTo(panel)
+        display.newSprite('imgs/btn1.png', 300, 45 * i):addTo(panel)
     end
 
     -- 使用此函数，前提是scrollview坐标为(0,0)，由viewRect来确定显示位置
-    -- sv:resetPosition()
-    sv:scrollAuto()
+    sv:resetPosition()
+    -- sv:scrollAuto()
 end
 
 function MainScene:addPageView()
     local pv = cc.ui.UIPageView.new({
-        viewRect = cc.rect(200, 200, 200, 200),
+        viewRect = cc.rect(20, 20, 200, 200),
         column = 2,
         row = 4,
         columnSpace = 5,
