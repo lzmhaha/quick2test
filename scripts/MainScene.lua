@@ -244,6 +244,11 @@ function MainScene:drawcallTest()
     node:addTo(self):pos(50, 100)
 end
 
+function MainScene:setUserDataTest()
+    cc.UserDefault:sharedUserDefault():setStringForKey('name', 'cwt')
+    print(cc.UserDefault:sharedUserDefault():getStringForKey('name'))
+end
+
 function MainScene:update(dt)
     -- print('on update', dt)
 end
