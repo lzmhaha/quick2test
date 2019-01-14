@@ -9,3 +9,7 @@ CONFIG_SCREEN_HEIGHT = 640
 
 -- auto scale mode
 CONFIG_SCREEN_AUTOSCALE = "FIXED_HEIGHT"
+
+-- LANGUAGE = "en"
+-- LANGUAGE = "zh_CN"
+LANGUAGE = "zh_TW"

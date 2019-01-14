@@ -1,6 +1,14 @@
 require("config")
 require("framework.init")
 
+function gettext(text)
+    return text
+end
+local langPath = "res/langs/"..LANGUAGE..'.mo'
+if CCFileUtils:sharedFileUtils():isFileExist(langPath) then
+    gettext = assert(require("framework.cc.utils.Gettext").gettextFromFile(langPath))
+end
+
 -- define global module
 game = {}
 
