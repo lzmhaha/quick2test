@@ -8,7 +8,11 @@ function MainScene:ctor()
     math.randomseed(os.time())
 
     -- local lb = ui.newBMFontLabel({text = '123', font = 'fonts/font.fnt'})
-    local lb = ui.newTTFLabel({text = gettext("game"), size = 70, color = display.COLOR_BLACK})
+    _('apple')
+    local num = 7
+    local name = 'John'
+    local text = _('I have %d apples', num) .. '\n' .. _('my name is %s', name)
+    local lb = ui.newTTFLabel({text = text, size = 70, color = display.COLOR_BLACK})
     lb:pos(display.cx, display.cy):addTo(self, 1)
     self.lb = lb
 

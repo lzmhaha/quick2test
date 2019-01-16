@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-01-14 16:59+0800\n"
-"PO-Revision-Date: 2019-01-14 17:32+0800\n"
+"POT-Creation-Date: 2019-01-16 10:10+0800\n"
+"PO-Revision-Date: 2019-01-16 10:26+0800\n"
 "Last-Translator: 陈伟庭 <chenweiting@ijunhai.com>\n"
 "Language-Team: \n"
 "Language: en\n"
@@ -12,10 +12,19 @@ msgstr ""
 "X-Generator: Poedit 2.2\n"
 "X-Poedit-Basepath: ../scripts\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-KeywordsList: gettext\n"
+"X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: MainScene.lua:11
+msgid "apple"
+msgstr ""
+
+#: MainScene.lua:12
+#, lua-format
+msgid "I have %d apples"
+msgstr "I have %d apples"
+
+#: MainScene.lua:13
 msgid "game"
 msgstr "game"
 

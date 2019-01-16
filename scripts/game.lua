@@ -1,12 +1,15 @@
 require("config")
 require("framework.init")
 
-function gettext(text)
+function _(text)
     return text
 end
 local langPath = "res/langs/"..LANGUAGE..'.mo'
 if CCFileUtils:sharedFileUtils():isFileExist(langPath) then
-    gettext = assert(require("framework.cc.utils.Gettext").gettextFromFile(langPath))
+    local t = assert(require("framework.cc.utils.Gettext").gettextFromFile(langPath))
+    _ = function(format, ...)
+        return string.format(t(format), ...)
+    end
 end
 
 -- define global module
