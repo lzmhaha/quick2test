@@ -23,6 +23,7 @@ function MainScene:ctor()
     self:addListView()
     self:addScrollView()
     self:addPageView()
+    self:addRichText()
     self:addUi()
 
     self:scheduleUpdate(handler(self, self.update))
@@ -297,6 +298,16 @@ function MainScene:blendFuncTest()
     f.src = gl.GL_DST_COLOR
     f.dst = gl.GL_ONE_MINUS_SRC_ALPHA
     self.sp:setBlendFunc(f)
+end
+
+function MainScene:addRichText()
+    local text = RichElementText:create(0, cc.c3b(0, 255, 0), 125, 'rich text', '', 40)
+    local img = RichElementImage:create(0, cc.c3b(255, 255, 0), 200, 'imgs/btn1.png')
+    local rt = RichText:create()
+    rt:pushBackElement(text)
+    rt:pushBackElement(img)
+    rt:setPosition(cc.p(400, 100))
+    self:addChild(rt)
 end
 
 function MainScene:update(dt)
