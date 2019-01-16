@@ -33,6 +33,8 @@ function MainScene:ctor()
 
     -- 截屏
     -- display.printscreen(self, {file = device.writablePath..'la.jpg'})
+
+    self:hotUpdateTest()
 end
 
 function MainScene:onEnter()
@@ -251,6 +253,41 @@ end
 function MainScene:setUserDataTest()
     cc.UserDefault:sharedUserDefault():setStringForKey('name', 'cwt')
     print(cc.UserDefault:sharedUserDefault():getStringForKey('name'))
+end
+
+local function checkDir(path)
+    local lfs = require "lfs"
+    local oldpath = lfs.currentdir()
+    CCLuaLog("old path------> "..oldpath)
+
+    if lfs.chdir(path) then
+        lfs.chdir(oldpath)
+        CCLuaLog("path check OK------> "..path)
+        return true
+    end
+
+    if lfs.mkdir(path) then
+        CCLuaLog("path create OK------> "..path)
+        return true
+    end
+end
+
+function MainScene:hotUpdateTest()
+    print(require('test'))
+
+    local lfs = require('lfs')
+    local updPath = device.writablePath .. 'upd/'
+    checkDir(updPath)
+    cc.FileUtils:sharedFileUtils():addSearchPath(updPath) -- 这一句应该提前调用，在addSearchPath('res/')之, 确保先用到更新的资源
+    local scripts = {
+        'local t = 123',
+        'print(123123123123)',
+        'return t',
+    }
+    io.writefile(updPath .. 'test.lua', table.concat(scripts, "\n"), 'w')
+
+    package.loaded['test'] = nil
+    print(require('test'))
 end
 
 function MainScene:update(dt)
