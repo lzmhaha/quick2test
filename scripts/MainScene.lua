@@ -35,6 +35,8 @@ function MainScene:ctor()
     -- display.printscreen(self, {file = device.writablePath..'la.jpg'})
 
     self:hotUpdateTest()
+
+    self:blendFuncTest()
 end
 
 function MainScene:onEnter()
@@ -288,6 +290,13 @@ function MainScene:hotUpdateTest()
 
     package.loaded['test'] = nil
     print(require('test'))
+end
+
+function MainScene:blendFuncTest()
+    local f = ccBlendFunc()
+    f.src = gl.GL_DST_COLOR
+    f.dst = gl.GL_ONE_MINUS_SRC_ALPHA
+    self.sp:setBlendFunc(f)
 end
 
 function MainScene:update(dt)
