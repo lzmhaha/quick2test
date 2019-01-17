@@ -45,6 +45,10 @@ function AStar:searchPath(start, goal)
     local f = {}            -- f = g + h
     local from = {}
 
+    local function openSortFunc(i1, i2)
+        return f[i1] < f[i2]
+    end
+
     while cur ~= goalIdx do
         -- 确保cur周围的点都加入到open列表，并判断是否从当前点'过去'会更近
         local x, y = self:_idx2Pos(cur)
@@ -67,23 +71,16 @@ function AStar:searchPath(start, goal)
                 from[idx] = cur
             end
         end)
+        
+        -- open列表排序
+        table.sort(open, openSortFunc)
 
-        -- 在open列表中找到f值最小的点，加入到close列表
-        local minIdx = -1
-        local minF = -1
-        for _, idx in ipairs(open) do
-            if minF < 0 or f[idx] < minF then
-                minF = f[idx]
-                minIdx = idx
-            end
-        end
-
-        if minIdx == -1 then
+        if #open == 0 then
             printError('search path fail from (%d, %d) to (%d, %d)', start.x, start.y, goal.x, goal.y)
             return
         else
-            cur = minIdx
-            table.remove(open, table.indexof(open, cur))
+            cur = open[1]
+            table.remove(open, 1)
             close[cur] = true
         end
     end
