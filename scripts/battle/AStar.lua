@@ -94,25 +94,72 @@ function AStar:searchPath(start, goal)
         table.insert(path, 1, {x = x, y = y})
         cur = from[cur]
     end
+
+    -- 去掉同一直线上多余的点
+    local p1, p2, p3
+    for i = #path, 1, -1 do
+        if not p1 then
+            p1 = path[i]
+        elseif not p2 then
+            p2 = path[i]
+        else
+            p3 = path[i]
+            local dx1 = p1.x - p2.x
+            local dy1 = p1.y - p2.y
+            local dx2 = p2.x - p3.x
+            local dy2 = p2.y - p3.y
+            if dx1 == 0 and dx2 == 0 or dy1 / dx1 == dy2 / dx2 then
+                table.removebyvalue(path, p2)
+            else
+                p1 = p2
+            end
+            p2 = p3
+        end
+    end
+
     return path
 end
 
 function AStar:printMap(path)
     local strs = {}
     for y = self.height, 1, -1 do
+        table.insert(strs, '|')
         for x = 1, self.width, 1 do
             if self:_isBlockAt(x, y) then
                 table.insert(strs, '@ ')
             else
-                table.insert(strs, '- ')
+                table.insert(strs, '  ')
             end
         end
-        table.insert(strs, '\n')
+        table.insert(strs, '|\n')
     end
     if path and #path then
+        -- 打印路径点
         for i, p in ipairs(path) do
-            local idx = p.x + (self.height - p.y) * (self.width + 1) -- width+1 是加上 '\n'
+            local idx = p.x + (self.height - p.y) * (self.width + 2) + 1 -- '*2' '+1' 算上'|' '|\n'
             strs[idx] = '* '
+        end
+        -- 补齐路径
+        for i = 1, #path - 1 do
+            local p1 = path[i]
+            local p2 = path[i + 1]
+            local dx = p2.x - p1.x
+            local dy = p2.y - p1.y
+            dx = dx == 0 and 0 or (dx / math.abs(dx))
+            dy = dy == 0 and 0 or (dy / math.abs(dy))
+            local isx = math.abs(dx) >= math.abs(dy)
+            local d = isx and dx or dy
+            local min = (isx and p1.x or p1.y) + d
+            local max = (isx and p2.x or p2.y) - d
+            local x, y
+            for i = min, max, d do
+                x = x or (p1.x + dx)
+                y = y or (p1.y + dy)
+                local idx = x + (self.height - y) * (self.width + 2) + 1
+                strs[idx] = '+ '
+                x = x + dx
+                y = y + dy
+            end
         end
     end
     print('-------------------map----------------\n' .. table.concat(strs))
