@@ -58,8 +58,9 @@ function AStar:searchPath(start, goal)
             if self:_isBlockAt(p.x, p.y) or close[idx] then
                 return
             elseif table.indexof(open, idx) then
-                if g[cur] + 1 < g[idx] then
-                    g[idx] = g[cur] + self:_calculateDis(x, y, p.x, p.y)
+                local dis2p = self:_calculateDis(x, y, p.x, p.y)
+                if g[cur] + dis2p < g[idx] then
+                    g[idx] = g[cur] + dis2p
                     f[idx] = g[idx] + h[idx]
                     from[idx] = cur
                 end
@@ -71,10 +72,9 @@ function AStar:searchPath(start, goal)
                 from[idx] = cur
             end
         end)
-        
+
         -- open列表排序
         table.sort(open, openSortFunc)
-
         if #open == 0 then
             printError('search path fail from (%d, %d) to (%d, %d)', start.x, start.y, goal.x, goal.y)
             return
@@ -174,7 +174,7 @@ function AStar:_getNearPoints(x, y)
         for dy = -1, 1 do
             local inMap = self:_isPosInMap(x + dx, y + dy)  -- 是否在地图内
             local isSelf = dx == 0 and dy == 0              -- 是否为中心点
-            local isDiagonal = dx ~= 0 and dy ~= 0           -- 是否为对角点
+            local isDiagonal = dx ~= 0 and dy ~= 0          -- 是否为对角点
 
             -- 4方向
             -- if (not isSelf) and (not isDiagonal) and inMap then
