@@ -1,3 +1,5 @@
+local AStar = import('battle.AStar')
+
 local MainScene = class("MainScene", function()
     return display.newScene("MainScene")
 end)
@@ -38,6 +40,8 @@ function MainScene:ctor()
     self:hotUpdateTest()
 
     self:blendFuncTest()
+
+    self:astarTest()
 end
 
 function MainScene:onEnter()
@@ -308,6 +312,24 @@ function MainScene:addRichText()
     rt:pushBackElement(img)
     rt:setPosition(cc.p(400, 100))
     self:addChild(rt)
+end
+
+function MainScene:astarTest()
+    local as = AStar.new({
+        0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 1, 0, 1, 0, 0,
+        0, 1, 0, 1, 1, 1, 0, 1, 0, 0,
+        0, 1, 0, 0, 0, 1, 0, 1, 0, 0,
+        0, 1, 1, 1, 0, 1, 0, 1, 0, 0,
+        0, 0, 0, 1, 0, 1, 0, 1, 0, 0,
+        1, 1, 0, 1, 0, 1, 0, 1, 0, 0,
+        0, 0, 0, 1, 0, 1, 0, 1, 0, 0,
+        0, 1, 1, 1, 0, 1, 0, 1, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    }, 10, 10)
+    as:printMap()
+    local path = as:searchPath({x = 1, y = 1}, {x = 10, y = 10})
+    if path then as:printMap(path) end
 end
 
 function MainScene:update(dt)
