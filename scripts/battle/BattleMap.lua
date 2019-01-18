@@ -4,6 +4,7 @@ local BattleMap = class('BattleMap', function(filePath)
 end)
 
 local MAP_MAX_SCALE = 5
+local Map_MAX_SCALE_BACK = 4    -- 放大回弹
 local MAP_MIN_SCALE = 0.2
 
 local MIN_MOVE_DIS = 10 -- 触摸移动最小阈值
@@ -109,7 +110,7 @@ function BattleMap:_onMove(event)
     x, y = self:_checkPos(x, y)
 
     self:pos(x, y)
-    self:scale(scale)
+    if scale then self:scale(scale) end
 end
 
 function BattleMap:_onRelease(event)
@@ -162,7 +163,6 @@ function BattleMap:_checkPos(_x, _y)
     if y - size.height / 2 * scale > 0 then y = size.height / 2 * scale end
     if y + size.height / 2 * scale < display.height then y = display.height - size.height / 2 * scale end
     return x, y, x == _x, y == _y
-    
 end
 
 return BattleMap
