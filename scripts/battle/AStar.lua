@@ -1,10 +1,14 @@
 local AStar = class('AStar')
 
--- grids 为一维数组 0: 空地 1: 障碍物
+-- grids 为一维数组 0: 空地, 1: 城墙, > 1: 其他障碍物
 AStar._grids = nil
 AStar.width = 0
 AStar.height = 0
 
+local ID_SPACE = 0
+local ID_WALL = 1
+
+local WALL_SCALE = 1000    -- 翻越障碍物的消耗倍数
 local SQRT_2 = math.sqrt(2)
 
 function AStar:ctor(grids, width, height)
@@ -21,7 +25,12 @@ function AStar:init(grids, width, height)
     self.height = height
 end
 
-function AStar:searchPath(start, goal)
+--[[
+    start: 起点
+    goal: 终点
+    enablePassWall: 是否允许跳过城墙
+]]
+function AStar:searchPath(start, goal, enablePassWall)
     if not self._grids then
         printError('err: astar has not inited')
         return
@@ -55,17 +64,20 @@ function AStar:searchPath(start, goal)
         local nears = self:_getNearPoints(x, y)
         table.walk(nears, function(p)
             local idx = self:_pos2Idx(p.x, p.y)
-            if self:_isBlockAt(p.x, p.y) or close[idx] then
+            local isWall = self:_isWall(p.x, p.y)
+            local scale = (isWall or self:_isWall(x, y)) and WALL_SCALE or 1
+            local canPass = (not self:_isBlock(p.x, p.y)) or (isWall and enablePassWall)
+            if close[idx] or (not canPass)then
                 return
             elseif table.indexof(open, idx) then
-                local dis2p = self:_calculateDis(x, y, p.x, p.y)
+                local dis2p = self:_calculateDis(x, y, p.x, p.y) * scale
                 if g[cur] + dis2p < g[idx] then
                     g[idx] = g[cur] + dis2p
                     f[idx] = g[idx] + h[idx]
                     from[idx] = cur
                 end
             else
-                g[idx] = g[cur] + self:_calculateDis(x, y, p.x, p.y)
+                g[idx] = g[cur] + self:_calculateDis(x, y, p.x, p.y) * scale
                 h[idx] = self:_calculateDis(x, y, goal.x, goal.y)
                 f[idx] = g[idx] + h[idx]
                 table.insert(open, idx)
@@ -122,7 +134,7 @@ function AStar:printMap(path)
     for y = self.height, 1, -1 do
         table.insert(strs, '|')
         for x = 1, self.width, 1 do
-            if self:_isBlockAt(x, y) then
+            if self:_isBlock(x, y) then
                 table.insert(strs, '@ ')
             else
                 table.insert(strs, '  ')
@@ -163,8 +175,12 @@ function AStar:printMap(path)
 end
 
 -- private
-function AStar:_isBlockAt(x, y)
-    return self._grids[self:_pos2Idx(x, y)] ~= 0
+function AStar:_isBlock(x, y)
+    return self._grids[self:_pos2Idx(x, y)] ~= ID_SPACE
+end
+
+function AStar:_isWall(x, y)
+    return self._grids[self:_pos2Idx(x, y)] == ID_WALL
 end
 
 -- 获取周围连接的点
@@ -182,7 +198,7 @@ function AStar:_getNearPoints(x, y)
             -- end
 
             -- 8方向
-            -- if inMap and (not isSelf) and ((not isDiagonal) or not(self:_isBlockAt(x, y + dy) and self:_isBlockAt(x + dx, y))) then
+            -- if inMap and (not isSelf) and ((not isDiagonal) or not(self:_isBlock(x, y + dy) and self:_isBlock(x + dx, y))) then
             if inMap and not isSelf then
                 table.insert(ret, {x = x + dx, y = y + dy})
             end
