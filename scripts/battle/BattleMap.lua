@@ -162,6 +162,7 @@ function BattleMap:_checkPos(_x, _y)
     if y - size.height / 2 * scale > 0 then y = size.height / 2 * scale end
     if y + size.height / 2 * scale < display.height then y = display.height - size.height / 2 * scale end
     return x, y, x == _x, y == _y
+    
 end
 
 return BattleMap
