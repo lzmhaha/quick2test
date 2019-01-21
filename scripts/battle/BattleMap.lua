@@ -10,12 +10,14 @@ local MAP_MIN_SCALE = 0.2
 local MIN_MOVE_DIS = 10 -- 触摸移动最小阈值
 
 function BattleMap:ctor()
-    self.spdDir = cc.p(0, 0)
-    self.spd = 0
-    self.pressing = false
-    self.moveDelta = cc.p(0, 0)
-    self.moving = false
-    self.moveQueue = {} -- 储存3个滑动位移，用于滑动后缓动，取平均值表现更平滑
+    self._spdDir = cc.p(0, 0)
+    self._spd = 0
+    self._pressing = false
+    self._moveDelta = cc.p(0, 0)
+    self._moving = false
+    self._moveQueue = {} -- 储存3个滑动位移，用于滑动后缓动，取平均值表现更平滑
+    self._size = self:getMapSize()
+    self._tileSize = self:getTileSize()
 
     self:setTouchMode(cc.TOUCH_MODE_ALL_AT_ONCE)
     self:addNodeEventListener(cc.NODE_TOUCH_EVENT, handler(self, self._onTouch))
@@ -41,11 +43,11 @@ function BattleMap:_onTouch(event)
 end
 
 function BattleMap:_onPress(event)
-    self.pressing = true
-    self.moveDelta.x = 0
-    self.moveDelta.y = 0
-    self.moveQueue = {}
-    self.moving = false
+    self._pressing = true
+    self._moveDelta.x = 0
+    self._moveDelta.y = 0
+    self._moveQueue = {}
+    self._moving = false
 end
 
 function BattleMap:_onMove(event)
@@ -68,17 +70,17 @@ function BattleMap:_onMove(event)
         dy = dy / 2
     end
 
-    table.insert(self.moveQueue, {x = dx, y = dy})
-    if self.moveQueue[3] then table.remove(self.moveQueue, 1) end
+    table.insert(self._moveQueue, {x = dx, y = dy})
+    if self._moveQueue[3] then table.remove(self._moveQueue, 1) end
 
     -- 滑动距离过短，先不做移动处理
-    if not self.moving then
-        self.moveDelta.x = self.moveDelta.x + dx
-        self.moveDelta.y = self.moveDelta.y + dy
-        if self.moveDelta:getLength() > MIN_MOVE_DIS then
-            self.moving = true
-            dx = self.moveDelta.x
-            dy = self.moveDelta.y
+    if not self._moving then
+        self._moveDelta.x = self._moveDelta.x + dx
+        self._moveDelta.y = self._moveDelta.y + dy
+        if self._moveDelta:getLength() > MIN_MOVE_DIS then
+            self._moving = true
+            dx = self._moveDelta.x
+            dy = self._moveDelta.y
         else
             return
         end
@@ -114,20 +116,20 @@ function BattleMap:_onMove(event)
 end
 
 function BattleMap:_onRelease(event)
-    self.pressing = false
-    if not self.moving then
+    self._pressing = false
+    if not self._moving then
         self:_onClick(event)
     else
-        self.spdDir.x = 0
-        self.spdDir.y = 0
-        for i, p in ipairs(self.moveQueue) do
-            self.spdDir.x = self.spdDir.x + p.x
-            self.spdDir.y = self.spdDir.y + p.y
+        self._spdDir.x = 0
+        self._spdDir.y = 0
+        for i, p in ipairs(self._moveQueue) do
+            self._spdDir.x = self._spdDir.x + p.x
+            self._spdDir.y = self._spdDir.y + p.y
         end
-        self.spdDir.x = self.spdDir.x / #self.moveQueue
-        self.spdDir.y = self.spdDir.y / #self.moveQueue
-        self.spd = self.spdDir:getLength()
-        self.spdDir = self.spdDir:normalize()
+        self._spdDir.x = self._spdDir.x / #self._moveQueue
+        self._spdDir.y = self._spdDir.y / #self._moveQueue
+        self._spd = self._spdDir:getLength()
+        self._spdDir = self._spdDir:normalize()
     end
 end
 
@@ -138,15 +140,15 @@ function BattleMap:_onClick(event)
 end
 
 function BattleMap:_update(dt)
-    if (not self.pressing) then
-        if self.spd > 0 then
+    if (not self._pressing) then
+        if self._spd > 0 then
             local x, y = self:getPosition()
-            x = x + self.spdDir.x * self.spd
-            y = y + self.spdDir.y * self.spd
+            x = x + self._spdDir.x * self._spd
+            y = y + self._spdDir.y * self._spd
             local xok, yok
             x, y, xok, yok = self:_checkPos(x, y)
             self:pos(x, y)
-            self.spd = (xok or yok) and self.spd - 1 or 0
+            self._spd = (xok or yok) and self._spd - 1 or 0
         else
             -- 回弹
         end
