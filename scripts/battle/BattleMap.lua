@@ -26,10 +26,9 @@ function BattleMap:ctor()
     self:setTouchSwallowEnabled(true)
     self:setTouchEnabled(true)
 
-    local floor = self:layerNamed('floor')
-    floor:setTileGID(4, cc.p(0, 0))
+    self.floor = self:layerNamed('floor')
     -- 抗锯齿
-    floor:getTexture():setAntiAliasTexParameters()
+    self.floor:getTexture():setAntiAliasTexParameters()
 end
 
 function BattleMap:_onTouch(event)
@@ -136,7 +135,9 @@ end
 function BattleMap:_onClick(event)
     local x = event.points['0'].x
     local y = event.points['0'].y
-    print(string.format('on click, %d, %d', x, y))
+    local grid = self:_touch2grid(x, y)
+    print(string.format('on click, %d, %d', grid.x, grid.y))
+    self.floor:setTileGID(4, cc.p(grid.x, grid.y))
 end
 
 function BattleMap:_update(dt)
@@ -165,6 +166,15 @@ function BattleMap:_checkPos(_x, _y)
     if y - size.height / 2 * scale > 0 then y = size.height / 2 * scale end
     if y + size.height / 2 * scale < display.height then y = display.height - size.height / 2 * scale end
     return x, y, x == _x, y == _y
+end
+
+function BattleMap:_touch2grid(x, y)
+    local posInMap = self:convertToNodeSpaceAR(cc.p(x, y))
+    local originX = posInMap.x
+    local originY = self._tileSize.height * self._size.height * 0.5 - posInMap.y
+    local gridX = math.floor(originX / self._tileSize.width + originY / self._tileSize.height)
+    local gridY = math.floor(originY / self._tileSize.height - originX / self._tileSize.width)
+    return cc.p(gridX, gridY)
 end
 
 return BattleMap
