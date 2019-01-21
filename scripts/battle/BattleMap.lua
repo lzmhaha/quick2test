@@ -104,14 +104,13 @@ function BattleMap:_onMove(event)
         dy = dy - posInMap.y * (scale - originScale)
     end
 
+    if scale then self:scale(scale) end
     -- 判断是否超出范围
     local x, y = self:getPosition()
     x = x + dx
     y = y + dy
     x, y = self:_checkPos(x, y)
-
     self:pos(x, y)
-    if scale then self:scale(scale) end
 end
 
 function BattleMap:_onRelease(event)
