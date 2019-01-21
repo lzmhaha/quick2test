@@ -70,7 +70,7 @@ function BattleMap:_onMove(event)
     end
 
     table.insert(self._moveQueue, {x = dx, y = dy})
-    if self._moveQueue[3] then table.remove(self._moveQueue, 1) end
+    if #self._moveQueue > 3 then table.remove(self._moveQueue, 1) end
 
     -- 滑动距离过短，先不做移动处理
     if not self._moving then
@@ -136,8 +136,10 @@ function BattleMap:_onClick(event)
     local x = event.points['0'].x
     local y = event.points['0'].y
     local grid = self:_touch2grid(x, y)
-    print(string.format('on click, %d, %d', grid.x, grid.y))
-    self.floor:setTileGID(4, cc.p(grid.x, grid.y))
+    if grid then
+        print(string.format('on click, %d, %d', grid.x, grid.y))
+        self.floor:setTileGID(4, cc.p(grid.x, grid.y))
+    end
 end
 
 function BattleMap:_update(dt)
@@ -170,10 +172,12 @@ end
 
 function BattleMap:_touch2grid(x, y)
     local posInMap = self:convertToNodeSpaceAR(cc.p(x, y))
+    -- 锚点(0.5, 1)的坐标，因为图块(0, 0)在地图的正上方
     local originX = posInMap.x
     local originY = self._tileSize.height * self._size.height * 0.5 - posInMap.y
     local gridX = math.floor(originX / self._tileSize.width + originY / self._tileSize.height)
     local gridY = math.floor(originY / self._tileSize.height - originX / self._tileSize.width)
+    if gridX < 0 or gridX >= self._size.width or gridY < 0 or gridY >= self._size.height then return nil end
     return cc.p(gridX, gridY)
 end
 
