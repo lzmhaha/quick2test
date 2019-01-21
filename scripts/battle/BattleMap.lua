@@ -4,8 +4,9 @@ local BattleMap = class('BattleMap', function(filePath)
 end)
 
 local MAP_MAX_SCALE = 5
-local Map_MAX_SCALE_BACK = 4    -- 放大回弹
 local MAP_MIN_SCALE = 0.2
+local MAP_MAX_SCALE_BACK = 4    -- 缩放回弹
+local MAP_SCALE_BACK_PER_FRAME = 0.05  -- 每帧回缩的量
 
 local MIN_MOVE_DIS = 10 -- 触摸移动最小阈值
 
@@ -16,8 +17,11 @@ function BattleMap:ctor()
     self._moveDelta = cc.p(0, 0)
     self._moving = false
     self._moveQueue = {} -- 储存3个滑动位移，用于滑动后缓动，取平均值表现更平滑
-    self._size = self:getMapSize()
+    self._mapSize = self:getMapSize()
     self._tileSize = self:getTileSize()
+
+    self._floor = self:layerNamed('floor')
+    self._floor:getTexture():setAntiAliasTexParameters() -- 抗锯齿
 
     self:setTouchMode(cc.TOUCH_MODE_ALL_AT_ONCE)
     self:addNodeEventListener(cc.NODE_TOUCH_EVENT, handler(self, self._onTouch))
@@ -25,10 +29,6 @@ function BattleMap:ctor()
     self:scheduleUpdate_()
     self:setTouchSwallowEnabled(true)
     self:setTouchEnabled(true)
-
-    self.floor = self:layerNamed('floor')
-    -- 抗锯齿
-    self.floor:getTexture():setAntiAliasTexParameters()
 end
 
 function BattleMap:_onTouch(event)
@@ -110,8 +110,7 @@ function BattleMap:_onMove(event)
     local x, y = self:getPosition()
     x = x + dx
     y = y + dy
-    x, y = self:_checkPos(x, y)
-    self:pos(x, y)
+    self:pos(self:_checkPos(x, y))
 end
 
 function BattleMap:_onRelease(event)
@@ -138,22 +137,33 @@ function BattleMap:_onClick(event)
     local grid = self:_touch2grid(x, y)
     if grid then
         print(string.format('on click, %d, %d', grid.x, grid.y))
-        self.floor:setTileGID(4, cc.p(grid.x, grid.y))
+        self._floor:setTileGID(4, cc.p(grid.x, grid.y))
     end
 end
 
 function BattleMap:_update(dt)
     if (not self._pressing) then
+        -- 缓动
+        local x, y = self:getPosition()
+        local dx, dy
         if self._spd > 0 then
-            local x, y = self:getPosition()
-            x = x + self._spdDir.x * self._spd
-            y = y + self._spdDir.y * self._spd
-            local xok, yok
-            x, y, xok, yok = self:_checkPos(x, y)
-            self:pos(x, y)
-            self._spd = (xok or yok) and self._spd - 1 or 0
-        else
-            -- 回弹
+            dx = self._spdDir.x * self._spd
+            dy = self._spdDir.y * self._spd
+            self._spd = self._spd - 1
+        end
+
+        -- 回弹
+        local scale = self:getScale()
+        if scale > MAP_MAX_SCALE_BACK then
+            dx = dx or 0
+            dy = dy or 0
+            self:scale(scale - MAP_SCALE_BACK_PER_FRAME)
+            dx = dx - (x - display.cx) * (MAP_SCALE_BACK_PER_FRAME / scale)
+            dy = dy - (y - display.cy) * (MAP_SCALE_BACK_PER_FRAME / scale)
+        end
+
+        if dx and dy then
+            self:pos(self:_checkPos(x + dx, y + dy))
         end
     end
 end
@@ -174,10 +184,10 @@ function BattleMap:_touch2grid(x, y)
     local posInMap = self:convertToNodeSpaceAR(cc.p(x, y))
     -- 锚点(0.5, 1)的坐标，因为图块(0, 0)在地图的正上方
     local originX = posInMap.x
-    local originY = self._tileSize.height * self._size.height * 0.5 - posInMap.y
+    local originY = self._tileSize.height * self._mapSize.height * 0.5 - posInMap.y
     local gridX = math.floor(originX / self._tileSize.width + originY / self._tileSize.height)
     local gridY = math.floor(originY / self._tileSize.height - originX / self._tileSize.width)
-    if gridX < 0 or gridX >= self._size.width or gridY < 0 or gridY >= self._size.height then return nil end
+    if gridX < 0 or gridX >= self._mapSize.width or gridY < 0 or gridY >= self._mapSize.height then return nil end
     return cc.p(gridX, gridY)
 end
 
