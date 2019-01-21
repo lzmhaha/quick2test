@@ -33,7 +33,7 @@ end
 
 function BattleMap:_onTouch(event)
     if event.name == 'began' then
-        self:_onPress()
+        self:_onPress(event)
     elseif event.name == 'moved' then
         self:_onMove(event)
     elseif event.name == 'ended' then
@@ -47,6 +47,7 @@ function BattleMap:_onPress(event)
     self._moveDelta.y = 0
     self._moveQueue = {}
     self._moving = false
+    self._spd = 0
 end
 
 function BattleMap:_onMove(event)
